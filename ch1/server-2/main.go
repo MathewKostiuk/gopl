@@ -22,7 +22,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	count++
 	mu.Unlock()
-	fmt.Fprintf(w, "URL.Path = %q\n", r.URL.Path)
+	fmt.Fprintf(w, "URL.Path = %q\nURL.RawQuery = %q\n", r.URL.Path, r.URL.RawQuery)
 }
 
 // counter echoes the number of calls so far.
