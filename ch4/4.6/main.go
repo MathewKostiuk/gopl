@@ -29,5 +29,5 @@ func main() {
 			}
 		}
 	}
-	fmt.Println(string(b[:]))
+	fmt.Println(string(b))
 }
