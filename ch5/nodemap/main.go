@@ -26,6 +26,7 @@ func mapEls(dm map[string]int, n *html.Node) map[string]int {
 	if n == nil {
 		return dm
 	}
+
 	if n.Type == html.ElementNode {
 		dm[n.Data]++
 	}
