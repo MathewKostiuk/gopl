@@ -1,0 +1,13 @@
+github.com/MathewKostiuk/countwi v0.0.0-20210923014306-499514aa3e68 h1:WeXVXpVP5yCnIHJKW5xK5dpyTQpJCJPzN89oPLRbODA=
+github.com/MathewKostiuk/countwi v0.0.0-20210923014306-499514aa3e68/go.mod h1:DJ3Fe+YHO9c5zB4q3sSUoub3Kl+dBGUJ5NqU01LhMiQ=
+github.com/MathewKostiuk/countwi v0.1.0 h1:bi5+F+qLvBSHAsTp/qmelkM5n14M0LmosnDFGm4jJGI=
+github.com/MathewKostiuk/countwi v0.1.0/go.mod h1:DJ3Fe+YHO9c5zB4q3sSUoub3Kl+dBGUJ5NqU01LhMiQ=
+github.com/MathewKostiuk/countwi v0.2.0 h1:Bad4C5g2u8mNCkdOXFYG5iVbaHJxd2sJEY/t4MKp8yE=
+github.com/MathewKostiuk/countwi v0.2.0/go.mod h1:DJ3Fe+YHO9c5zB4q3sSUoub3Kl+dBGUJ5NqU01LhMiQ=
+golang.org/x/net v0.0.0-20210917221730-978cfadd31cf h1:R150MpwJIv1MpS0N/pc+NhTM8ajzvlmxlY5OYsrevXQ=
+golang.org/x/net v0.0.0-20210917221730-978cfadd31cf/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
+golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20210423082822-04245dca01da/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
+golang.org/x/text v0.3.6/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
+golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
