@@ -93,7 +93,7 @@ func writeSVG(out io.Writer, width, height, xyscale, zscale float64, p, v string
 	fmt.Fprintf(out, "</svg>")
 }
 
-func corner(i, j int, width, height, xyscale, zscale float64) (float64, float64, bool) {
+func corner(i, j int, width, height, xyscale, zscale float64) (sx, sy float64, neg bool) {
 	// Find point (x,y) at corner of cell (i,j).
 	x := xyrange * (float64(i)/cells - 0.5)
 	y := xyrange * (float64(j)/cells - 0.5)
@@ -101,16 +101,16 @@ func corner(i, j int, width, height, xyscale, zscale float64) (float64, float64,
 	// Compute surface height z.
 	z := f(x, y)
 
-	neg := math.Signbit(z)
+	neg = math.Signbit(z)
 
 	if math.IsInf(z, 0) {
 		return math.NaN(), math.NaN(), false
 	}
 
 	// Project (x,y,z) isometrically onto 2D SVG canvas (sx,sy).
-	sx := width/2 + (x-y)*cos30*xyscale
-	sy := height/2 + (x+y)*sin30*xyscale - z*zscale
-	return sx, sy, neg
+	sx = width/2 + (x-y)*cos30*xyscale
+	sy = height/2 + (x+y)*sin30*xyscale - z*zscale
+	return
 }
 
 func f(x, y float64) float64 {
