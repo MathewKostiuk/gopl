@@ -18,6 +18,20 @@ func (s *IntSet) Has(x int) bool {
 	return word < len(s.words) && s.words[word]&(1<<bit) != 0
 }
 
+// HasAll reports whether the set contains all of the non-negative values vals.
+func (s *IntSet) HasAll(vals ...int) bool {
+	has := true
+
+	for _, x := range vals {
+		h := s.Has(x)
+		if !h {
+			has = false
+			break
+		}
+	}
+	return has
+}
+
 // Add adds the non-negative value x to the set.
 func (s *IntSet) Add(x int) {
 	word, bit := x/64, uint(x%64)
@@ -27,14 +41,10 @@ func (s *IntSet) Add(x int) {
 	s.words[word] |= 1 << bit
 }
 
-// UnionWith sets s to the union of s and t.
-func (s *IntSet) UnionWith(t *IntSet) {
-	for i, tword := range t.words {
-		if i < len(s.words) {
-			s.words[i] |= tword
-		} else {
-			s.words = append(s.words, tword)
-		}
+// Add all values
+func (s *IntSet) AddAll(vals ...int) {
+	for _, x := range vals {
+		s.Add(x)
 	}
 }
 
@@ -95,9 +105,13 @@ func (s *IntSet) Copy() *IntSet {
 	return &y
 }
 
-// Add all values
-func (s *IntSet) AddAll(vals ...int) {
-	for _, x := range vals {
-		s.Add(x)
+// UnionWith sets s to the union of s and t.
+func (s *IntSet) UnionWith(t *IntSet) {
+	for i, tword := range t.words {
+		if i < len(s.words) {
+			s.words[i] |= tword
+		} else {
+			s.words = append(s.words, tword)
+		}
 	}
 }

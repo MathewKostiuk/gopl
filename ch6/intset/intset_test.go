@@ -4,28 +4,41 @@ import (
 	"testing"
 )
 
-func TestAdd(t *testing.T) {
-	var x, y IntSet
-	x.Add(1)
-	x.Add(144)
-	x.Add(9)
-
-	y.Add(9)
-	y.Add(42)
-
-	x.UnionWith(&y)
-
-	hasNine, hasOneTwoThree := x.Has(9), x.Has(123)
-	if !hasNine && !hasOneTwoThree {
-		t.Errorf("the intset does not contain %d and %d", 9, 123)
-	}
-}
-
 func TestHas(t *testing.T) {
 	var x IntSet
 	x.Add(1000)
 	if has := x.Has(1000); !has {
 		t.Errorf("the value %d is not in the IntSet", 1000)
+	}
+}
+
+func TestAdd(t *testing.T) {
+	var x IntSet
+	x.Add(1)
+	x.Add(2)
+	x.Add(3)
+
+	has1 := x.Has(1)
+	if !has1 {
+		t.Errorf("the intset does not contain %d.", 1)
+	}
+	has2 := x.Has(2)
+	if !has2 {
+		t.Errorf("the intset does not contain %d.", 2)
+	}
+	has3 := x.Has(3)
+	if !has3 {
+		t.Errorf("the intset does not contain %d.", 3)
+	}
+}
+
+func TestAddAll(t *testing.T) {
+	var x IntSet
+	x.AddAll(1, 2, 3)
+
+	h := x.HasAll(1, 2, 3)
+	if !h {
+		t.Error("the intset does not contain all values")
 	}
 }
 
@@ -82,20 +95,31 @@ func TestCopy(t *testing.T) {
 	}
 }
 
-func TestAddAll(t *testing.T) {
-	var x IntSet
-	x.AddAll(1, 2, 3)
+func TestUnion(t *testing.T) {
+	var x, y IntSet
+	x.Add(1)
+	x.Add(144)
+	x.Add(9)
 
-	has1 := x.Has(1)
-	if !has1 {
-		t.Errorf("the intset does not contain %d.", 1)
+	y.Add(9)
+	y.Add(42)
+
+	x.UnionWith(&y)
+
+	hasNine, hasOneTwoThree := x.Has(9), x.Has(123)
+	if !hasNine && !hasOneTwoThree {
+		t.Errorf("the intset does not contain %d and %d", 9, 123)
 	}
-	has2 := x.Has(2)
-	if !has2 {
-		t.Errorf("the intset does not contain %d.", 2)
-	}
-	has3 := x.Has(3)
-	if !has3 {
-		t.Errorf("the intset does not contain %d.", 3)
-	}
+}
+
+func TestIntersectWith(t *testing.T) {
+	var x, y IntSet
+	x.Add(1)
+	x.Add(2)
+	x.Add(3)
+
+	y.Add(2)
+	y.Add(3)
+	y.Add(5)
+
 }
