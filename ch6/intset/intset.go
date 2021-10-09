@@ -145,3 +145,22 @@ func (s *IntSet) SymmetricDifferenceWith(t *IntSet) {
 	// set s to the union of s and t (differences)
 	s.UnionWith(t)
 }
+
+// Elems returns a slice containing the elements of the set.
+// Suitable for iterating over with a `range` loop
+func (s *IntSet) Elems() *[]int {
+	var sl []int
+
+	for i, word := range s.words {
+		if word == 0 {
+			continue
+		}
+
+		for j := 0; j < 64; j++ {
+			if word&(1<<uint(j)) != 0 {
+				sl = append(sl, 64*i+j)
+			}
+		}
+	}
+	return &sl
+}

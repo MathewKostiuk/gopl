@@ -1,7 +1,6 @@
 package intset
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -155,5 +154,24 @@ func TestSymmetricDifferenceWith(t *testing.T) {
 	has := x.HasAll(1, 2, 3, 4, 5, 6)
 	if !has {
 		t.Error("z does not have all of the required elements")
+	}
+}
+
+func TestElems(t *testing.T) {
+	var x IntSet
+	x.AddAll(1, 2, 3)
+
+	s := x.Elems()
+
+	for i, el := range *s {
+		if i == 0 && el != 1 {
+			t.Errorf("element is missing: %d", el)
+		}
+		if i == 1 && el != 2 {
+			t.Errorf("element is missing: %d", el)
+		}
+		if i == 2 && el != 3 {
+			t.Errorf("element is missing: %d", el)
+		}
 	}
 }
