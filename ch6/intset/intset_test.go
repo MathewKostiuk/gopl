@@ -81,3 +81,21 @@ func TestCopy(t *testing.T) {
 		t.Errorf("the copied intset does not have %d, %d, %d.", 10, 100, 1000)
 	}
 }
+
+func TestAddAll(t *testing.T) {
+	var x IntSet
+	x.AddAll(1, 2, 3)
+
+	has1 := x.Has(1)
+	if !has1 {
+		t.Errorf("the intset does not contain %d.", 1)
+	}
+	has2 := x.Has(2)
+	if !has2 {
+		t.Errorf("the intset does not contain %d.", 2)
+	}
+	has3 := x.Has(3)
+	if !has3 {
+		t.Errorf("the intset does not contain %d.", 3)
+	}
+}

@@ -94,3 +94,10 @@ func (s *IntSet) Copy() *IntSet {
 	}
 	return &y
 }
+
+// Add all values
+func (s *IntSet) AddAll(vals ...int) {
+	for _, x := range vals {
+		s.Add(x)
+	}
+}
