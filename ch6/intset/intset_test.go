@@ -1,6 +1,7 @@
 package intset
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -114,12 +115,45 @@ func TestUnion(t *testing.T) {
 
 func TestIntersectWith(t *testing.T) {
 	var x, y IntSet
-	x.Add(1)
-	x.Add(2)
-	x.Add(3)
+	x.AddAll(1, 2, 3)
+	y.AddAll(2, 3, 5)
+	x.IntersectWith(&y)
 
-	y.Add(2)
-	y.Add(3)
-	y.Add(5)
+	has := x.HasAll(2, 3)
+	if !has {
+		t.Error("x does not have all intersecting values")
+	}
 
+	has1 := x.Has(1)
+	if has1 {
+		t.Errorf("x still has this element: %d", 1)
+	}
+}
+
+func TestDifferenceWith(t *testing.T) {
+	var x, y IntSet
+	x.AddAll(1, 2, 3)
+	y.AddAll(2, 3, 4)
+	x.DifferenceWith(&y)
+
+	has := x.Has(2)
+	if has {
+		t.Errorf("x still has %d", 2)
+	}
+	has2 := x.Has(3)
+	if has2 {
+		t.Errorf("x still has %d", 3)
+	}
+}
+
+func TestSymmetricDifferenceWith(t *testing.T) {
+	var x, y IntSet
+	x.AddAll(1, 2, 3)
+	y.AddAll(4, 5, 6)
+	x.SymmetricDifferenceWith(&y)
+
+	has := x.HasAll(1, 2, 3, 4, 5, 6)
+	if !has {
+		t.Error("z does not have all of the required elements")
+	}
 }

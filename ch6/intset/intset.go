@@ -115,3 +115,33 @@ func (s *IntSet) UnionWith(t *IntSet) {
 		}
 	}
 }
+
+// IntersectWith sets s to the intersection of s and t.
+func (s *IntSet) IntersectWith(t *IntSet) {
+	for i, tword := range t.words {
+		if i < len(s.words) {
+			s.words[i] &= tword
+		}
+	}
+}
+
+// DifferenceWith sets s to the difference of s and t.
+func (s *IntSet) DifferenceWith(t *IntSet) {
+	for i, tword := range t.words {
+		if i < len(s.words) {
+			s.words[i] = s.words[i] & (^tword)
+		}
+	}
+}
+
+// SymmetricDifferenceWith returns a set that contains the
+// elements present in one set or the other but not both.
+func (s *IntSet) SymmetricDifferenceWith(t *IntSet) {
+	sc := s.Copy()
+	// set s to the difference of s and t
+	s.DifferenceWith(t)
+	// set t to the difference of t and s
+	t.DifferenceWith(sc)
+	// set s to the union of s and t (differences)
+	s.UnionWith(t)
+}
