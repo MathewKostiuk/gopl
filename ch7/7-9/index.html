@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <table>
+    <tbody>
+      <tr>
+        <th data-table-header data-heading="title">Title</th>
+        <th data-table-header data-heading="artist">Artist</th>
+        <th data-table-header data-heading="album">Album</th>
+        <th data-table-header data-heading="year">Year</th>
+        <th data-table-header data-heading="length">Length</th>
+      </tr>
+      {{ range .Tracks}}
+      <tr>
+        <td>{{.Title}}</td>
+        <td>{{.Artist}}</td>
+        <td>{{.Album}}</td>
+        <td>{{.Year}}</td>
+        <td>{{.Length}}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+  <script>
+    window.onload = () => bindEvents();
+    function bindEvents() {
+      const tableHeaders = document.querySelectorAll('[data-table-header]');
+      tableHeaders.forEach(header => {
+        console.log(header);
+        header.addEventListener('click', handleTableHeaderClick)
+      });
+    }
+    function handleTableHeaderClick(e) {
+      const { heading } = e.target.dataset;
+
+      const body = { name: heading }
+      fetch(
+        '/sort',
+        {
+          method: 'POST',
+          credentials: 'same-origin',
+          body: JSON.stringify(body)
+        }
+      )
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+          const newTbody = doc.querySelector('tbody');
+          const table = document.querySelector('table');
+          table.innerHTML = '';
+          table.appendChild(newTbody);
+          bindEvents();
+        });
+    }
+  </script>
+</body>
+</html>
