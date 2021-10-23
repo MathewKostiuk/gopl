@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,9 +23,14 @@ func main() {
 }
 
 func (db database) list(w http.ResponseWriter, req *http.Request) {
-	for item, price := range db {
-		fmt.Fprintf(w, "%s: %s\n", item, price)
+	defer req.Body.Close()
+
+	tmpl, err := template.ParseFiles("index.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, "error while parsing template")
 	}
+	tmpl.Execute(w, db)
 }
 
 func (db database) price(w http.ResponseWriter, req *http.Request) {
