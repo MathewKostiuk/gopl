@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/cmplx"
 	"os"
+	"sync"
 )
 
 const (
@@ -45,7 +46,7 @@ func Supersample(width, height int) image.Image {
 			c1 := doubleImg.At(dpx+1, dpy)
 			c2 := doubleImg.At(dpx, dpy+1)
 			c3 := doubleImg.At(dpx+1, dpy+1)
-			avg := avgColour(c0, c1, c2, c3)
+			avg := avgColor(c0, c1, c2, c3)
 			img.Set(px, py, avg)
 		}
 	}
@@ -53,7 +54,40 @@ func Supersample(width, height int) image.Image {
 	return img
 }
 
-func avgColour(colors ...color.Color) color.Color {
+func normalImg(width, height int) image.Image {
+	var wg sync.WaitGroup
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
+	for py := 0; py < height; py++ {
+		y := float64(py)/float64(height)*(ymax-ymin) + ymin
+		for px := 0; px < width; px++ {
+			wg.Add(1)
+			x := float64(px)/float64(width)*(xmax-xmin) + xmin
+			z := complex(x, y)
+			// Image point (px, py) represent complex value z.
+			go func(px, py int, z complex128) {
+				defer wg.Done()
+				img.Set(px, py, mandelbrot(z))
+			}(px, py, z)
+		}
+	}
+	return img
+}
+
+func mandelbrot(z complex128) color.Color {
+	const iterations = 200
+	const contrast = 15
+
+	var v complex128
+	for n := uint8(0); n < iterations; n++ {
+		v = v*v + z
+		if cmplx.Abs(v) > 2 {
+			return color.Gray{255 - contrast*n}
+		}
+	}
+	return color.Black
+}
+
+func avgColor(colors ...color.Color) color.Color {
 	var rsum, gsum, bsum uint32
 	for _, c := range colors {
 		r, g, b, _ := c.RGBA()
@@ -72,32 +106,4 @@ func avgColour(colors ...color.Color) color.Color {
 		B: uint8(b / 0x101),
 		A: 255,
 	}
-}
-
-func normalImg(width, height int) image.Image {
-	img := image.NewRGBA(image.Rect(0, 0, width, height))
-	for py := 0; py < height; py++ {
-		y := float64(py)/float64(height)*(ymax-ymin) + ymin
-		for px := 0; px < width; px++ {
-			x := float64(px)/float64(width)*(xmax-xmin) + xmin
-			z := complex(x, y)
-			// Image point (px, py) represent complex value z.
-			img.Set(px, py, mandelbrot(z))
-		}
-	}
-	return img
-}
-
-func mandelbrot(z complex128) color.Color {
-	const iterations = 200
-	const contrast = 15
-
-	var v complex128
-	for n := uint8(0); n < iterations; n++ {
-		v = v*v + z
-		if cmplx.Abs(v) > 2 {
-			return color.Gray{255 - contrast*n}
-		}
-	}
-	return color.Black
 }
