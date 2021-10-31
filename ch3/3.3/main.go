@@ -16,13 +16,12 @@ const (
 )
 
 func main() {
-
 	f, err := os.Create("mandelbrot.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	img := supersample(1024, 1024)
+	img := Supersample(1024, 1024)
 
 	if err := png.Encode(f, img); err != nil {
 		f.Close()
@@ -34,7 +33,7 @@ func main() {
 	}
 }
 
-func supersample(width, height int) image.Image {
+func Supersample(width, height int) image.Image {
 	doubleImg := normalImg(width*2, height*2)
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
 
