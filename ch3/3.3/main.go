@@ -14,6 +14,7 @@ import (
 
 const (
 	xmin, ymin, xmax, ymax = -2, -2, +2, +2
+	routines               = 1024
 )
 
 func main() {
@@ -56,20 +57,33 @@ func Supersample(width, height int) image.Image {
 
 func normalImg(width, height int) image.Image {
 	var wg sync.WaitGroup
+	var done = make(chan struct{})
+	var size = height / routines
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
-	for py := 0; py < height; py++ {
-		y := float64(py)/float64(height)*(ymax-ymin) + ymin
-		for px := 0; px < width; px++ {
-			wg.Add(1)
-			x := float64(px)/float64(width)*(xmax-xmin) + xmin
-			z := complex(x, y)
-			// Image point (px, py) represent complex value z.
-			go func(px, py int, z complex128) {
-				defer wg.Done()
-				img.Set(px, py, mandelbrot(z))
-			}(px, py, z)
-		}
+
+	for i := 0; i < routines; i++ {
+		wg.Add(1)
+
+		go func(i int) {
+			defer wg.Done()
+			for py := size * i; py < size*(i+1); py++ {
+				y := float64(py)/float64(height)*(ymax-ymin) + ymin
+				for px := 0; px < width; px++ {
+					x := float64(px)/float64(width)*(xmax-xmin) + xmin
+					z := complex(x, y)
+					// Image point (px, py) represent complex value z.
+					img.Set(px, py, mandelbrot(z))
+				}
+			}
+			done <- struct{}{}
+		}(i)
 	}
+
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
 	return img
 }
 

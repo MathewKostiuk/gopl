@@ -4,6 +4,6 @@ import "testing"
 
 func BenchmarkSuperimage(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Supersample(1024, 1024)
+		Supersample(2048, 2048)
 	}
 }
