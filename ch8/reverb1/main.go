@@ -10,10 +10,6 @@ import (
 	"time"
 )
 
-type Closer interface {
-	CloseWrite() error
-}
-
 func main() {
 	listener, err := net.Listen("tcp", "localhost:8000")
 	if err != nil {
@@ -43,6 +39,10 @@ func handleConn(c net.Conn) {
 			time.Sleep(1 * time.Second)
 			fmt.Fprintln(c, "\t", strings.ToLower(shout))
 			wg.Done()
+			select {
+			case <-time.After(10 * time.Second):
+				c.Close()
+			}
 		}(input.Text())
 	}
 	// closer
@@ -53,7 +53,7 @@ func handleConn(c net.Conn) {
 }
 
 func shutdownWrite(conn net.Conn) {
-	v, ok := conn.(Closer)
+	v, ok := conn.(*net.TCPConn)
 	if ok {
 		v.CloseWrite()
 	}
