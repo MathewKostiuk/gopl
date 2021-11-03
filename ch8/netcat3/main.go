@@ -1,16 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net"
 	"os"
 )
-
-type Closer interface {
-	CloseWrite() error
-}
 
 func main() {
 	conn, err := net.Dial("tcp", "localhost:8000")
@@ -39,7 +34,7 @@ func mustCopy(dst io.Writer, src io.Reader) {
 }
 
 func shutdownWrite(conn net.Conn) {
-	v, ok := conn.(Closer)
+	v, ok := conn.(*net.TCPConn)
 	if ok {
 		v.CloseWrite()
 	}
