@@ -15,6 +15,9 @@ var verbose = flag.Bool("v", false, "show verbose progress messages")
 // sema is a counting semaphore for limiting concurrency in dirents.
 var sema = make(chan struct{}, 20)
 
+// done is a cancellation signal
+var done = make(chan struct{})
+
 type rootDir struct {
 	name           string
 	nfiles, nbytes int64
@@ -27,6 +30,11 @@ func main() {
 	if len(roots) == 0 {
 		roots = []string{"."}
 	}
+
+	go func() {
+		os.Stdin.Read(make([]byte, 1)) // read a single byte
+		close(done)
+	}()
 
 	// Traverse each root of the file tree in parallel
 	var rootDirs []*rootDir
@@ -52,6 +60,12 @@ func main() {
 loop:
 	for {
 		select {
+		case <-done:
+			// Drain fileSizes to allow existing goroutines to finish.
+			for range fileSizes {
+				// Do nothing
+			}
+			panic("program cancelled")
 		case _, ok := <-fileSizes:
 			if !ok {
 				break loop
@@ -70,6 +84,9 @@ func printDiskUsage(rd string, nfiles, nbytes int64) {
 
 func walkDir(rd *rootDir, dir string, n *sync.WaitGroup, fileSizes chan<- rootDir) {
 	defer n.Done()
+	if cancelled() {
+		return
+	}
 	for _, entry := range dirents(dir) {
 		if entry.IsDir() {
 			n.Add(1)
@@ -84,7 +101,11 @@ func walkDir(rd *rootDir, dir string, n *sync.WaitGroup, fileSizes chan<- rootDi
 }
 
 func dirents(dir string) []os.FileInfo {
-	sema <- struct{}{}        // acquire token
+	select {
+	case sema <- struct{}{}: // acquire token
+	case <-done:
+		return nil
+	}
 	defer func() { <-sema }() // release token
 	entries, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -92,4 +113,13 @@ func dirents(dir string) []os.FileInfo {
 		return nil
 	}
 	return entries
+}
+
+func cancelled() bool {
+	select {
+	case <-done:
+		return true
+	default:
+		return false
+	}
 }
