@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 )
 
 type client struct {
@@ -60,8 +61,10 @@ func broadcaster() {
 }
 
 func handleConn(conn net.Conn) {
-	ch := make(chan string) // outgoing client messages
+	ch := make(chan string)       // outgoing client messages
+	active := make(chan struct{}) // listen for not-idle signal
 	go clientWriter(conn, ch)
+	go handleIdleClient(conn, active)
 
 	name := conn.RemoteAddr().String()
 	client := client{name, ch}
@@ -71,6 +74,7 @@ func handleConn(conn net.Conn) {
 
 	input := bufio.NewScanner(conn)
 	for input.Scan() {
+		active <- struct{}{} // user is active
 		messages <- name + ": " + input.Text()
 	}
 	// NOTE: ignoring potential errors from input.Err()
@@ -83,5 +87,15 @@ func handleConn(conn net.Conn) {
 func clientWriter(conn net.Conn, ch <-chan string) {
 	for msg := range ch {
 		fmt.Fprintln(conn, msg) // NOTE: ignoring network errors
+	}
+}
+
+func handleIdleClient(conn net.Conn, ch chan struct{}) {
+	select {
+	case <-ch:
+		handleIdleClient(conn, ch)
+		break
+	case <-time.After(10 * time.Second):
+		conn.Close()
 	}
 }
