@@ -64,18 +64,23 @@ func broadcaster() {
 }
 
 func handleConn(conn net.Conn) {
+	input := bufio.NewScanner(conn)
+	fmt.Fprint(conn, "enter your name:")
+	var name string
 	ch := make(chan string, 20)   // outgoing client messages
 	active := make(chan struct{}) // listen for not-idle signal
 	go clientWriter(conn, ch)
 	go handleIdleClient(conn, active)
 
-	name := conn.RemoteAddr().String()
+	if input.Scan() {
+		name = input.Text()
+	}
+
 	client := client{name, ch}
 	ch <- "You are " + name
 	messages <- name + " has arrived"
 	entering <- client
 
-	input := bufio.NewScanner(conn)
 	for input.Scan() {
 		active <- struct{}{} // user is active
 		messages <- name + ": " + input.Text()
