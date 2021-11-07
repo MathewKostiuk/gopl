@@ -1,13 +1,17 @@
 package popcount
 
 import (
-	"fmt"
 	"testing"
 )
 
-func TestPopCount(t *testing.T) {
-	fmt.Println(PopCount(uint64(15)))
-	fmt.Println(PopCount(uint64(109)))
-	fmt.Println(PopCount(uint64(20)))
+func BenchmarkPopCount(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		PopCount(60000)
+	}
+}
 
+func BenchmarkPopCountLoop(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		PopCountLoop(60000)
+	}
 }
