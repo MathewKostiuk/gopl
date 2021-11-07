@@ -44,7 +44,10 @@ func broadcaster() {
 			// Broadcast incoming messages to all
 			// clients' outgoing message channels.
 			for cli := range clients {
-				cli.ch <- msg
+				select {
+				case cli.ch <- msg:
+				default:
+				}
 			}
 		case nc := <-entering:
 			clients[nc] = true
@@ -61,7 +64,7 @@ func broadcaster() {
 }
 
 func handleConn(conn net.Conn) {
-	ch := make(chan string)       // outgoing client messages
+	ch := make(chan string, 20)   // outgoing client messages
 	active := make(chan struct{}) // listen for not-idle signal
 	go clientWriter(conn, ch)
 	go handleIdleClient(conn, active)
